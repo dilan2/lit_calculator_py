@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор инвестиционной привлекательности курса</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Applying the Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom styles for better chart appearance on dark background */
+        .chart-container {
+            position: relative;
+            height: 40vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-indigo-600 dark:text-indigo-400">Калькулятор окупаемости инвестиций в обучение</h1>
+            <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Оцените, насколько выгодным будет прохождение курса для вашего дохода.</p>
+        </header>
+
+        <!-- Input Controls Section -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Current Income Input -->
+                <div>
+                    <label for="current-income" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ваш текущий ежемесячный доход (PLN)</label>
+                    <input type="number" id="current-income" value="5000" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+                <!-- Installment Period Select -->
+                <div>
+                    <label for="installment-period" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Период рассрочки (месяцы)</label>
+                    <select id="installment-period" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                        <option value="5">5 месяцев</option>
+                        <option value="10" selected>10 месяцев</option>
+                        <option value="20">20 месяцев</option>
+                        <option value="30">30 месяцев</option>
+                        <option value="40">40 месяцев</option>
+                        <option value="50">50 месяцев</option>
+                    </select>
+                </div>
+            </div>
+             <p class="text-center mt-4 text-sm text-gray-500 dark:text-gray-400">Стоимость курса: 7 000 PLN. Расчетный период: 24 месяца.</p>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-lg mb-8">
+            <h2 class="text-xl font-bold text-center mb-4">Динамика дохода</h2>
+            <div class="chart-container">
+                <canvas id="incomeChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Results Table Section -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
+            <h2 class="text-xl font-bold text-center mb-4">Итоговые результаты за 24 месяца</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th class="p-4 font-semibold">Сценарий</th>
+                            <th class="p-4 font-semibold text-right">Общий доход</th>
+                            <th class="p-4 font-semibold text-right">Выгода (разница)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="p-4">Без изменений</td>
+                            <td id="total-income-no-change" class="p-4 text-right font-mono"></td>
+                            <td class="p-4 text-right font-mono">-</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 dark:border-gray-700">
+                            <td class="p-4 font-semibold text-indigo-600 dark:text-indigo-400">С прохождением курса</td>
+                            <td id="total-income-with-course" class="p-4 text-right font-mono font-semibold"></td>
+                            <td id="profit" class="p-4 text-right font-mono font-bold"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- CONFIGURATION CONSTANTS ---
+        const COURSE_PRICE = 7000;
+        const CALCULATION_PERIOD_MONTHS = 24;
+        const POST_COURSE_INCOME_PHASE1 = 7000; // Income from month 7 to 12
+        const POST_COURSE_INCOME_PHASE2 = 10000; // Income from month 13 onwards
+
+        // --- DOM ELEMENT REFERENCES ---
+        const incomeInput = document.getElementById('current-income');
+        const periodSelect = document.getElementById('installment-period');
+        const totalIncomeNoChangeCell = document.getElementById('total-income-no-change');
+        const totalIncomeWithCourseCell = document.getElementById('total-income-with-course');
+        const profitCell = document.getElementById('profit');
+        const ctx = document.getElementById('incomeChart').getContext('2d');
+
+        // --- CHART INITIALIZATION ---
+        let incomeChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Will be populated with "Месяц 1", "Месяц 2", ...
+                datasets: [{
+                    label: 'Доход без изменений',
+                    data: [],
+                    borderColor: 'rgb(161, 161, 170)', // zinc-500
+                    backgroundColor: 'rgba(161, 161, 170, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    fill: true,
+                }, {
+                    label: 'Доход с курсом',
+                    data: [],
+                    borderColor: 'rgb(99, 102, 241)', // indigo-500
+                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Доход (PLN)',
+                            color: '#9ca3af' // gray-400
+                        },
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Месяц',
+                            color: '#9ca3af'
+                        },
+                        ticks: { color: '#9ca3af' },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#d1d5db' // gray-300
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += formatCurrency(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+            }
+        });
+
+        // --- HELPER FUNCTION for currency formatting ---
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pl-PL', {
+                style: 'currency',
+                currency: 'PLN',
+                minimumFractionDigits: 2
+            }).format(value);
+        }
+
+        // --- MAIN CALCULATION FUNCTION ---
+        function updateCalculator() {
+            // 1. Get user inputs
+            const currentIncome = parseFloat(incomeInput.value) || 0;
+            const installmentMonths = parseInt(periodSelect.value);
+
+            // 2. Calculate monthly payment
+            const monthlyPayment = COURSE_PRICE / installmentMonths;
+
+            // 3. Prepare data arrays
+            const labels = [];
+            const incomeDataNoChange = [];
+            const incomeDataWithCourse = [];
+            let totalIncomeNoChange = 0;
+            let totalIncomeWithCourse = 0;
+
+            // 4. Loop through each month to calculate scenarios
+            for (let i = 1; i <= CALCULATION_PERIOD_MONTHS; i++) {
+                labels.push(`Месяц ${i}`);
+
+                // --- Scenario 1: No Change ---
+                incomeDataNoChange.push(currentIncome);
+                totalIncomeNoChange += currentIncome;
+
+                // --- Scenario 2: With Course ---
+                let currentMonthIncomeWithCourse;
+                const paymentThisMonth = (i <= installmentMonths) ? monthlyPayment : 0;
+
+                if (i <= 6) {
+                    // First 6 months: learning
+                    currentMonthIncomeWithCourse = currentIncome - paymentThisMonth;
+                } else if (i <= 12) {
+                    // Months 7-12: new job, first salary increase
+                    currentMonthIncomeWithCourse = POST_COURSE_INCOME_PHASE1 - paymentThisMonth;
+                } else {
+                    // Months 13+: second salary increase
+                    currentMonthIncomeWithCourse = POST_COURSE_INCOME_PHASE2 - paymentThisMonth;
+                }
+                
+                incomeDataWithCourse.push(currentMonthIncomeWithCourse);
+                totalIncomeWithCourse += currentMonthIncomeWithCourse;
+            }
+
+            // 5. Update Chart
+            incomeChart.data.labels = labels;
+            incomeChart.data.datasets[0].data = incomeDataNoChange;
+            incomeChart.data.datasets[1].data = incomeDataWithCourse;
+            incomeChart.update();
+
+            // 6. Update Table
+            totalIncomeNoChangeCell.textContent = formatCurrency(totalIncomeNoChange);
+            totalIncomeWithCourseCell.textContent = formatCurrency(totalIncomeWithCourse);
+
+            const profit = totalIncomeWithCourse - totalIncomeNoChange;
+            profitCell.textContent = formatCurrency(profit);
+            
+            // Change color based on profit
+            if (profit > 0) {
+                profitCell.classList.remove('text-red-500');
+                profitCell.classList.add('text-green-500');
+            } else {
+                profitCell.classList.remove('text-green-500');
+                profitCell.classList.add('text-red-500');
+            }
+        }
+
+        // --- EVENT LISTENERS ---
+        // Recalculate when inputs change
+        incomeInput.addEventListener('input', updateCalculator);
+        periodSelect.addEventListener('change', updateCalculator);
+
+        // Initial calculation on page load
+        document.addEventListener('DOMContentLoaded', updateCalculator);
+    </script>
+
+</body>
+</html>
