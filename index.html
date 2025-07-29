@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор инвестиционной привлекательности курса</title>
+    <title>Kalkulator atrakcyjności inwestycyjnej kursu</title>
     
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -34,8 +34,8 @@
     <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
         
         <header class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-indigo-600 dark:text-indigo-400">Калькулятор окупаемости инвестиций в обучение</h1>
-            <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Оцените, насколько выгодным будет прохождение курса для вашего дохода.</p>
+            <h1 class="text-3xl sm:text-4xl font-bold text-indigo-600 dark:text-indigo-400">Kalkulator zwrotu z inwestycji w edukację</h1>
+            <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">Oceń, jak opłacalne będzie ukończenie kursu dla Twoich dochodów.</p>
         </header>
 
         <!-- Input Controls Section -->
@@ -43,28 +43,28 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Current Income Input -->
                 <div>
-                    <label for="current-income" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ваш текущий ежемесячный доход (PLN)</label>
+                    <label for="current-income" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Twój obecny miesięczny dochód (PLN)</label>
                     <input type="number" id="current-income" value="5000" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                 </div>
                 <!-- Installment Period Select -->
                 <div>
-                    <label for="installment-period" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Период рассрочки (месяцы)</label>
+                    <label for="installment-period" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Okres rat (miesiące)</label>
                     <select id="installment-period" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
-                        <option value="5">5 месяцев</option>
-                        <option value="10" selected>10 месяцев</option>
-                        <option value="20">20 месяцев</option>
-                        <option value="30">30 месяцев</option>
-                        <option value="40">40 месяцев</option>
-                        <option value="50">50 месяцев</option>
+                        <option value="5">5 miesięcy</option>
+                        <option value="10" selected>10 miesięcy</option>
+                        <option value="20">20 miesięcy</option>
+                        <option value="30">30 miesięcy</option>
+                        <option value="40">40 miesięcy</option>
+                        <option value="50">50 miesięcy</option>
                     </select>
                 </div>
             </div>
-             <p class="text-center mt-4 text-sm text-gray-500 dark:text-gray-400">Стоимость курса: 7 000 PLN. Расчетный период: 24 месяца.</p>
+             <p class="text-center mt-4 text-sm text-gray-500 dark:text-gray-400">Okres obliczeniowy: 24 miesiące.</p>
         </div>
 
         <!-- Chart Section -->
         <div class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-lg mb-8">
-            <h2 class="text-xl font-bold text-center mb-4">Динамика дохода</h2>
+            <h2 class="text-xl font-bold text-center mb-4">Dynamika dochodów</h2>
             <div class="chart-container">
                 <canvas id="incomeChart"></canvas>
             </div>
@@ -72,24 +72,24 @@
 
         <!-- Results Table Section -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg">
-            <h2 class="text-xl font-bold text-center mb-4">Итоговые результаты за 24 месяца</h2>
+            <h2 class="text-xl font-bold text-center mb-4">Wyniki końcowe za 24 miesiące</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead class="bg-gray-50 dark:bg-gray-700">
                         <tr>
-                            <th class="p-4 font-semibold">Сценарий</th>
-                            <th class="p-4 font-semibold text-right">Общий доход</th>
-                            <th class="p-4 font-semibold text-right">Выгода (разница)</th>
+                            <th class="p-4 font-semibold">Scenariusz</th>
+                            <th class="p-4 font-semibold text-right">Całkowity dochód</th>
+                            <th class="p-4 font-semibold text-right">Zysk (różnica)</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr class="border-b border-gray-200 dark:border-gray-700">
-                            <td class="p-4">Без изменений</td>
+                            <td class="p-4">Bez zmian</td>
                             <td id="total-income-no-change" class="p-4 text-right font-mono"></td>
                             <td class="p-4 text-right font-mono">-</td>
                         </tr>
                         <tr class="border-b border-gray-200 dark:border-gray-700">
-                            <td class="p-4 font-semibold text-indigo-600 dark:text-indigo-400">С прохождением курса</td>
+                            <td class="p-4 font-semibold text-indigo-600 dark:text-indigo-400">Po ukończeniu kursu</td>
                             <td id="total-income-with-course" class="p-4 text-right font-mono font-semibold"></td>
                             <td id="profit" class="p-4 text-right font-mono font-bold"></td>
                         </tr>
@@ -102,10 +102,20 @@
 
     <script>
         // --- CONFIGURATION CONSTANTS ---
-        const COURSE_PRICE = 7000;
         const CALCULATION_PERIOD_MONTHS = 24;
-        const POST_COURSE_INCOME_PHASE1 = 7000; // Income from month 7 to 12
-        const POST_COURSE_INCOME_PHASE2 = 10000; // Income from month 13 onwards
+        const POST_COURSE_INCOME_PHASE1 = 8000; // Income from month 7 to 12
+        const POST_COURSE_INCOME_PHASE2 = 12000; // Income from month 13 onwards
+
+        // --- NEW: CONFIGURATION OBJECT FOR INSTALLMENT PLANS ---
+        // Здесь можно задать конкретный ежемесячный платеж для каждого варианта рассрочки
+        const INSTALLMENT_PLANS = {
+            '5': 1400, // 5 месяцев => 1400 PLN/месяц (Итого: 7000)
+            '10': 700, // 10 месяцев => 700 PLN/месяц (Итого: 7000)
+            '20': 400, // 20 месяцев => 400 PLN/месяц (Итого: 8000)
+            '30': 300, // 30 месяцев => 300 PLN/месяц (Итого: 9000)
+            '40': 250, // 40 месяцев => 250 PLN/месяц (Итого: 10000)
+            '50': 220  // 50 месяцев => 220 PLN/месяц (Итого: 11000)
+        };
 
         // --- DOM ELEMENT REFERENCES ---
         const incomeInput = document.getElementById('current-income');
@@ -119,9 +129,9 @@
         let incomeChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [], // Will be populated with "Месяц 1", "Месяц 2", ...
+                labels: [], // Will be populated with "Miesiąc 1", "Miesiąc 2", ...
                 datasets: [{
-                    label: 'Доход без изменений',
+                    label: 'Dochód bez zmian',
                     data: [],
                     borderColor: 'rgb(161, 161, 170)', // zinc-500
                     backgroundColor: 'rgba(161, 161, 170, 0.1)',
@@ -129,7 +139,7 @@
                     tension: 0.1,
                     fill: true,
                 }, {
-                    label: 'Доход с курсом',
+                    label: 'Dochód z kursem',
                     data: [],
                     borderColor: 'rgb(99, 102, 241)', // indigo-500
                     backgroundColor: 'rgba(99, 102, 241, 0.2)',
@@ -146,7 +156,7 @@
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Доход (PLN)',
+                            text: 'Dochód (PLN)',
                             color: '#9ca3af' // gray-400
                         },
                         ticks: { color: '#9ca3af' },
@@ -155,7 +165,7 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Месяц',
+                            text: 'Miesiąc',
                             color: '#9ca3af'
                         },
                         ticks: { color: '#9ca3af' },
@@ -207,8 +217,8 @@
             const currentIncome = parseFloat(incomeInput.value) || 0;
             const installmentMonths = parseInt(periodSelect.value);
 
-            // 2. Calculate monthly payment
-            const monthlyPayment = COURSE_PRICE / installmentMonths;
+            // 2. Get monthly payment from the configuration object
+            const monthlyPayment = INSTALLMENT_PLANS[installmentMonths] || 0;
 
             // 3. Prepare data arrays
             const labels = [];
@@ -219,7 +229,7 @@
 
             // 4. Loop through each month to calculate scenarios
             for (let i = 1; i <= CALCULATION_PERIOD_MONTHS; i++) {
-                labels.push(`Месяц ${i}`);
+                labels.push(`Miesiąc ${i}`);
 
                 // --- Scenario 1: No Change ---
                 incomeDataNoChange.push(currentIncome);
